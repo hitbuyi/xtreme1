@@ -1,4 +1,4 @@
-## How to update xtreme1's point clound detection model from CUDA-10.2 to CUDA-11.3 for AI annotating 
+## How to update xtreme1's point cloud detection model from CUDA-10.2 to CUDA-11.3 for AI annotating 
 
 point cloud's model used for AI annotating in xtreme1 (here is xtreme1-v091-point-cloud-object-detection) uses CUDA-10.2 , and can't run on CUDA-11.3, if your computer's GPU is newer when you use xtreme1's AI annotating function,xtreme1 prompts `Model Run Error`, you need to update xtreme1's point cloud detect model to CUDA-11.3 or other higher verions to run AI annotating correctly. here are steps to do updating process.
 
