@@ -24,6 +24,7 @@ ii  binutils                                     2.30-21ubuntu1~18.04.7      amd
 ...
 ```
 so we know ubuntu-18.04 was used to build this container
+
 find which version of python is used for the model 
 ```
 root@d803d8bc1748:/app/pcdet_open# python
