@@ -122,7 +122,7 @@ root@d803d8bc1748:/upgrade#$  sudo cp cuda/lib64/libcudnn* /usr/local/cuda-11.3/
 root@d803d8bc1748:/upgrade#$  sudo chmod a+r /usr/local/cuda-11.3/include/cudnn*.h /usr/local/cuda-11.3/lib64/libcudnn*
 ```
 
-use 'update-alternative' to change CUDA from 10.2 to 11.3
+use `update-alternative` to change CUDA from 10.2 to 11.3
 ```
 root@d803d8bc1748:/upgrade#$ sudo update-alternatives --install /usr/local/cuda cuda /usr/local/cuda-10.2 113
 root@d803d8bc1748:/upgrade#$ sudo update-alternatives --install /usr/local/cuda cuda /usr/local/cuda-11.3 120
