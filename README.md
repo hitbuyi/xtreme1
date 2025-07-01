@@ -4,7 +4,7 @@ point cloud's model used for AI annotating in xtreme1 (here is xtreme1-v091-poin
 
 ### step 1: run the whole conatainer 
     $ docker compose --profile model up    
-note that this command should be runned under xtreme1-v0.9.1 which conatain docker-compose.yml and deploy as the original project describled.if the container works well ,we'll see annotation web on http://localhost:8190 
+note that this command should be runned under xtreme1-v0.9.1 which conatains docker-compose.yml and deploy as the original project describled.if the container works well ,we'll see annotation web on http://localhost:8190 
 
 ### step 2: enter the point clound detection container 
     $ docker exec -it xtreme1-v091-point-cloud-object-detection-1 /bin/bash
@@ -147,8 +147,9 @@ note that pip can download `cumm-cu113` and `spconv-cu113`,though `ping` does no
 
 after installments are finished, delete all the install files
 ```
-root@d803d8bc1748:/upgrade#$ cd ..
-root@d803d8bc1748:/upgrade#$ sudo rm  -rf ./upgrade
+root@d803d8bc1748:/upgrade#$ cd /
+root@d803d8bc1748:/# sudo rm  -rf upgrade
+root@d803d8bc1748:/# exit
 ```
 
 ### step 8:restart the container
