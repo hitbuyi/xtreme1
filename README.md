@@ -1,6 +1,6 @@
 ## How to update xtreme1's point cloud detection model from CUDA-10.2 to CUDA-11.3 for AI annotating 
 
-point cloud's model used for AI annotating in xtreme1 (here is xtreme1-v091-point-cloud-object-detection) uses CUDA-10.2 , and can't run on CUDA-11.3, if your computer's GPU is newer when you use xtreme1's AI annotating function,xtreme1 prompts `Model Run Error`, you need to update xtreme1's point cloud detection model to CUDA-11.3 or other higher versions to run AI annotating correctly. here are steps to perform updating process.
+The point cloud's model used for AI annotating in xtreme1 (here is xtreme1-v091-point-cloud-object-detection) uses CUDA-10.2 , and can't run on CUDA-11.3, if your computer's GPU is newer when you use xtreme1's AI annotating function,xtreme1 prompts `Model Run Error`, you need to update xtreme1's point cloud detection model to CUDA-11.3 or other higher versions to run AI annotating correctly. here are steps to perform updating process.
 
 ### step 1: run the whole conatainer 
     $ docker compose --profile model up    
@@ -155,7 +155,7 @@ root@d803d8bc1748:/upgrade#$ pip install spconv-cu113
 ```
 note that pip can download `cumm-cu113` and `spconv-cu113`,though `ping` does not work. if your download speed is slow, I put `spconv-cu113` and other whl file used in step 4 [here](https://pan.baidu.com/s/5KyGaUIDCUsVZEbmc4Nq7Dw )
 
-after installments are finished, delete all the install files
+after the installations are complete, delete all the installation files
 ```
 root@d803d8bc1748:/upgrade#$ cd /
 root@d803d8bc1748:/# sudo rm  -rf upgrade
