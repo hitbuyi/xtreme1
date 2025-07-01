@@ -143,7 +143,7 @@ you will see CUDA version had been changed from 10.2 to 11.3
 root@d803d8bc1748:/upgrade#$ pip install cumm-cu113
 root@d803d8bc1748:/upgrade#$ pip install spconv-cu113
 ```
-note that pip can download cumm-cu113 and spconv-cu113,though `ping` does not work. if your download speed is slow, I put spconv and other whl file used in step 4 [here](https://pan.baidu.com/s/5KyGaUIDCUsVZEbmc4Nq7Dw )
+note that pip can download `cumm-cu113` and `spconv-cu113`,though `ping` does not work. if your download speed is slow, I put `spconv-cu113` and other whl file used in step 4 [here](https://pan.baidu.com/s/5KyGaUIDCUsVZEbmc4Nq7Dw )
 
 after installments are finished, delete all the install files
 ```
