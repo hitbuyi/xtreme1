@@ -89,7 +89,7 @@ total 3992772
 -rwxrwxrwx 1 1000 1000 1821432505 Jun 29 16:23 torch-1.10.1+cu113-cp36-cp36m-linux_x86_64.whl
 -rwxrwxrwx 1 1000 1000   24585457 Jun 29 16:16 torchvision-0.11.2+cu113-cp36-cp36m-linux_x86_64.whl
 ```
-those *.whl files can be downloaded in official websites, I also put them on [here](www.baidu.com)
+those *.whl files can be downloaded in official websites, I also put them on [here](https://pan.baidu.com/s/5KyGaUIDCUsVZEbmc4Nq7Dw )
 ### step 6: install torch,torchvision,CUDA-11.3 and CUDNN-8.2 
 #### 6.1 install torch,torchvision 
 ```
@@ -143,7 +143,7 @@ you will see CUDA version had been changed from 10.2 to 11.3
 root@d803d8bc1748:/upgrade#$ pip install cumm-cu113
 root@d803d8bc1748:/upgrade#$ pip install spconv-cu113
 ```
-note that pip can download cumm-cu113 and spconv-cu113,though `ping` does not work. if your download speed is slow, I put spconv and other whl file used in step 4 [here](wwww.baidu.com)
+note that pip can download cumm-cu113 and spconv-cu113,though `ping` does not work. if your download speed is slow, I put spconv and other whl file used in step 4 [here](https://pan.baidu.com/s/5KyGaUIDCUsVZEbmc4Nq7Dw )
 
 after installments are finished, delete all the install files
 ```
