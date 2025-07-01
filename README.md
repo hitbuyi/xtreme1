@@ -157,4 +157,4 @@ ctrl+c to stop the xtreme1-v091 started in step 1, and run:
     $ docker compose --profile model up
 
 open http://localhost:8190, login into it ,open a dataset to annotate ,run AI annotating, no model error happens
-![xtreme1 AI labeling](./images/AI%20Labelling.png) 
+![xtreme1 AI labeling](./docs/images/AI_Labelling.png) 
