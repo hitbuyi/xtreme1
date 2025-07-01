@@ -24,6 +24,15 @@ ii  binutils                                     2.30-21ubuntu1~18.04.7      amd
 ...
 ```
 so we know ubuntu-18.04 was used to build this container
+find which version of python is used for the model 
+```
+root@d803d8bc1748:/app/pcdet_open# python
+Python 3.6.9 (default, Jun 29 2022, 11:45:57) 
+[GCC 8.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+```
+we see python version is 3.6.9
+
 ### step 3: check versions of Pytorch and CUDA which were used
 ```
 $root@d803d8bc1748:/app/pcdet_open# pip list
