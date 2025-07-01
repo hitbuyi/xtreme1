@@ -1,12 +1,12 @@
 ## How to update xtreme1's point cloud detection model from CUDA-10.2 to CUDA-11.3 for AI annotating 
 
-point cloud's model used for AI annotating in xtreme1 (here is xtreme1-v091-point-cloud-object-detection) uses CUDA-10.2 , and can't run on CUDA-11.3, if your computer's GPU is newer when you use xtreme1's AI annotating function,xtreme1 prompts `Model Run Error`, you need to update xtreme1's point cloud detect model to CUDA-11.3 or other higher verions to run AI annotating correctly. here are steps to do updating process.
+point cloud's model used for AI annotating in xtreme1 (here is xtreme1-v091-point-cloud-object-detection) uses CUDA-10.2 , and can't run on CUDA-11.3, if your computer's GPU is newer when you use xtreme1's AI annotating function,xtreme1 prompts `Model Run Error`, you need to update xtreme1's point cloud detection model to CUDA-11.3 or other higher versions to run AI annotating correctly. here are steps to perform updating process.
 
 ### step 1: run the whole conatainer 
     $ docker compose --profile model up    
-note that this command should be runned under xtreme1-v0.9.1 which conatains docker-compose.yml and deploy as the original project describled.if the container works well ,we'll see annotation web on http://localhost:8190 
+note that this command should be run under xtreme1-v0.9.1 which contains docker-compose.yml and deploy as the original project described.if the container works well ,we'll see annotation web on http://localhost:8190 
 
-### step 2: enter the point clound detection container 
+### step 2: enter the point cloud detection container 
     $ docker exec -it xtreme1-v091-point-cloud-object-detection-1 /bin/bash
 
 to find which version of OS the image was used, use dpkg --list 
@@ -35,7 +35,7 @@ torch               1.10.1+cu102
 torchvision         0.11.2+cu102
 ...
 ```
-use pip to uninstall the above 4 CUDA 10.2 related packages
+use pip to uninstall the above 4 CUDA 10.2-related packages
 ```
 root@d803d8bc1748:/app/pcdet_open#  pip uninstall cumm-cu102
 root@d803d8bc1748:/app/pcdet_open#  pip uninstall spconv-cu102
@@ -75,7 +75,7 @@ copy files to container's upgrade folder
 ### step 5: enter the container again
     $ docker exec -it xtreme1-v091-point-cloud-object-detection-1 /bin/bash
 
- cd to upgrade,we the copied files here
+ cd to upgrade,we see the copied files here
  ```
  root@d803d8bc1748:/app/pcdet_open#  cd /upgrade
  root@d803d8bc1748:/upgrade# 
@@ -96,7 +96,7 @@ those *.whl files can be downloaded in official websites, I also put them on [he
 root@d803d8bc1748:/upgrade# pip install torch-1.10.1+cu113-cp36-cp36m-linux_x86_64.whl
 root@d803d8bc1748:/upgrade# pip install torchvision-0.11.2+cu113-cp36-cp36m-linux_x86_64.whl
 ```
-#### 6.2 instal CUDA-11.3 and CUDNN8.2
+#### 6.2 install CUDA-11.3 and CUDNN8.2
 ```
 root@d803d8bc1748:/upgrade# chmod +x cuda_11.3.1_465.19.01_linux.run
 root@d803d8bc1748:/upgrade#  sudo ./cuda_11.3.1_465.19.01_linux.run --silent --toolkit --override --installpath=/usr/local/cuda-11.3
@@ -157,5 +157,5 @@ ctrl+c to stop the xtreme1-v091 started in step 1, and run:
 
     $ docker compose --profile model up
 
-open http://localhost:8190, login into it ,open a dataset to annotate ,run AI annotating, no model error happens
+open http://localhost:8190, login into,open a dataset to annotate ,run AI annotating, no model error happens
 ![xtreme1 AI labeling](./docs/images/AI_Labelling.png) 
