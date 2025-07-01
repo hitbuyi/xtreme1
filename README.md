@@ -1,221 +1,160 @@
-<div align="center">
-<img width="386" alt="Xtreme1 logo" src="https://user-images.githubusercontent.com/84139543/190300943-98da7d5c-bd67-4074-a94f-b7405d29fb90.png">
+## How to update xtreme1's point clound detection model from CUDA-10.2 to CUDA-11.3 for AI annotating 
 
-![](https://img.shields.io/badge/Release-v0.9.1-green) 
-![](https://img.shields.io/badge/License-Apache%202.0-blueviolet)
-[![Twitter](https://img.shields.io/badge/Follow-Twitter-blue)](https://twitter.com/Xtreme1io)
-[![Docs](https://img.shields.io/badge/Docs-Stable-success.svg?style=flat&longCache=true)](http://docs.xtreme1.io/) 
+point cloud's model used for AI annotating in xtreme1 (here is xtreme1-v091-point-cloud-object-detection) uses CUDA-10.2 , and can't run on CUDA-11.3, if your computer's GPU is newer when you use xtreme1's AI annotating function,xtreme1 prompts `Model Run Error`, you need to update xtreme1's point cloud detect model to CUDA-11.3 or other higher verions to run AI annotating correctly. here are steps to do updating process.
 
-[![Use Cloud for Free](https://basicai-asset.s3.amazonaws.com/docs/Open-source/Operation/App_Button.png)](https://app.basic.ai)
-</div>
+### step 1: run the whole conatainer 
+    $ docker compose --profile model up    
+note that this command should be runned under xtreme1-v0.9.1 which conatain docker-compose.yml and deploy as the original project describled.if the container works well ,we'll see annotation web on http://localhost:8190 
 
-# Intro
+### step 2: enter the point clound detection container 
+    $ docker exec -it xtreme1-v091-point-cloud-object-detection-1 /bin/bash
 
-Xtreme1 is an all-in-one open-source platform for multimodal training data.
+to find which version of OS the image was used, use dpkg --list 
+```
+$root@d803d8bc1748:/app/pcdet_open# dpkg --list
+||/ Name                                         Version                     Architecture                Description
++++-============================================-===========================-===========================-===================================
+ii  adduser                                      3.116ubuntu1                all                         add and remove users and groups
+ii  apt                                          1.6.14                      amd64                       commandline package manager
+ii  apt-utils                                    1.6.14                      amd64                       package management related utility programs
+ii  base-files                                   10.1ubuntu2.11              amd64                       Debian base system miscellaneous files
+ii  base-passwd                                  3.5.44                      amd64                       Debian base system master password and group files
+ii  bash                                         4.4.18-2ubuntu1.3           amd64                       GNU Bourne Again SHell
+ii  binutils                                     2.30-21ubuntu1~18.04.7      amd64                       GNU assembler, linker and binary utilities
+...
+```
+so we know ubuntu-18.04 was used to build this container
+### step 3: check versions of Pytorch and CUDA which were used
+```
+$root@d803d8bc1748:/app/pcdet_open# pip list
+Package             Version        Editable project location
+------------------- -------------- -------------------------
+cumm-cu102          0.2.9  
+spconv-cu102        2.1.21
+torch               1.10.1+cu102
+torchvision         0.11.2+cu102
+...
+```
+use pip to uninstall the above 4 CUDA 10.2 related packages
+```
+root@d803d8bc1748:/app/pcdet_open#  pip uninstall cumm-cu102
+root@d803d8bc1748:/app/pcdet_open#  pip uninstall spconv-cu102
+root@d803d8bc1748:/app/pcdet_open#  pip uninstall torch
+root@d803d8bc1748:/app/pcdet_open#  pip uninstall torchvision
+```
+back to root folder /, and create upgrade folder for files used to update,  and  exit the container
 
-Xtreme1 unlocks efficiency in data annotation, curation, and ontology management for tackling machine learning challenges in computer vision and LLM. The platform's AI-fueled tools elevate your annotation to the next efficiency level, powering your projects in 2D/3D Object Detection, 2D/3D Semantic/Instance Segmentation, and LiDAR-Camera Fusion like never before.
-
-A long-term free plan is offered in the Xtreme1 Cloud version. Click to [🎉 Use Cloud for Free](https://app.basic.ai).
-
-The README document only includes content related to installation, building, and running, if you have any questions or doubts about features, you can always refer to our [Docs Site](https://docs.xtreme1.io/xtreme1-docs/).
-
-Find us on [Twitter](https://twitter.com/Xtreme1io) |  [Medium](https://medium.com/multisensory-data-training) | [Issues](https://github.com/xtreme1-io/xtreme1/issues) 
-
-# Key Features
-
-Image Annotation (B-box, Segmentation) - [YOLOR](https://github.com/WongKinYiu/yolor) & [RITM](https://github.com/saic-vul/ritm_interactive_segmentation) |  Lidar-camera Fusion Annotation - [OpenPCDet](https://github.com/open-mmlab/OpenPCDet) & [AB3DMOT](https://github.com/xinshuoweng/AB3DMOT)
-:-------------------------:|:-------------------------:
-![](/docs/images/image_ai.gif)  |  ![](/docs/images/3d_ai.gif)
-
- :one: Supports data labeling for images, 3D LiDAR and 2D/3D Sensor Fusion datasets
- 
- :two: Built-in pre-labeling and interactive models support 2D/3D object detection, segmentation and classification
- 
- :three: Configurable Ontology Center for general classes (with hierarchies) and attributes for use in your model training
-
- :four: Data management and quality monitoring
- 
- :five: Find labeling errors and fix them
-
- :six: Model results visualization to help you evaluate your model
- 
- :seven: RLHF for Large Language Models :new: (beta version)
-
-Image Data Curation (Visualizing & Debug)  - [MobileNetV3](https://github.com/xiaolai-sqlai/mobilenetv3) & [openTSNE](https://github.com/pavlin-policar/openTSNE)  | RLHF Annotation Tool for LLM (beta version)
-:-------------------------:|:-------------------------:
-![](/docs/images/2d_v.gif) |  <img src="/docs/images/0.7rlhf.webp" width="640"> 
-
-# Install
-
-## Prerequisites
-
-*Operating System Requirements*
-
-Any OS can install the Xtreme1 platform with Docker Compose (installing [Docker Desktop](https://docs.docker.com/desktop/) on Mac, Windows, and Linux devices). On the Linux server, you can install Docker Engine with [Docker Compose Plugin](https://docs.docker.com/compose/install/linux/).
-
-*Hardware Requirements*
-
-**CPU**: AMD64 or ARM64  
-**RAM**: 2GB or higher  
-**Hard Drive**: 10GB+ free disk space (depends on data size)
-
-*Software Requirements*
-
-For Mac, Windows, and Linux with desktop.
-
-**Docker Desktop**: 4.1 or newer
-
-For Linux server.
-
-**Docker Engine**: 20.10 or newer  
-**Docker Compose Plugin**: 2.0 or newer
-
-*(Built-in) Models Deployment Requirements*
-
-The built-in model containers only can be running on Linux server with [NVIDIA CUDA Driver](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html).
-
-**GPU**: NVIDIA T4 or other similar GPU  
-**RAM**: 4G or higher
-
-## Install with Docker
-
-### Download Package
-
-Download the latest release package and unzip it.
-
-```bash
-wget https://github.com/xtreme1-io/xtreme1/releases/download/v0.9.1/xtreme1-v0.9.1.zip
-unzip -d xtreme1-v0.9.1 xtreme1-v0.9.1.zip
+```
+root@d803d8bc1748:/app/pcdet_open# cd / 
+root@d803d8bc1748:/app/pcdet_open# make upgrade 
+root@d803d8bc1748:/app/pcdet_open# exit
 ```
 
-### Start Services
+### step 4: download ubuntu18.04's versions of CUDA11.3,CUDNN8.2,torchvision in host computer 
+```
+cuda_11.3.1_465.19.01_linux.run
+torch-1.10.1+cu113-cp36-cp36m-linux_x86_64.whl
+cudnn-11.3-linux-x64-v8.2.1.32.tgz 
+torchvision-0.11.2+cu113-cp36-cp36m-linux_x86_64.whl
+```
+`cuda_11.3.1_465.19.01_linux.run` and `cudnn-11.3-linux-x64-v8.2.1.32.tgz`  can be downloaded from [here](https://developer.nvidia.com/cuda-toolkit-archive) and `torch-1.10.1+cu113-cp36-cp36m-linux_x86_64.whl`,`torchvision-0.11.2+cu113-cp36-cp36m-linux_x86_64.whl` can be downloaded [here](https://download.pytorch.org/whl/torch_stable.html)
 
-Enter into the release package directory, and execute the following command to start all services. It needs a few minutes to initialize database and prepare a test dataset.
+cd to file folder which contained the downloaded files  
+```
+ $ ls -l
+-rwxrwxrwx 1 hitbuyi hitbuyi 3158494112 5月  14  2021 cuda_11.3.1_465.19.01_linux.run
+-rwxrwxrwx 1 hitbuyi hitbuyi 1879325034 6月  30 00:55 cudnn-11.3-linux-x64-v8.2.1.32.tgz
+-rwxrwxrwx 1 hitbuyi hitbuyi 1821432505 6月  30 00:23 torch-1.10.1+cu113-cp36-cp36m-linux_x86_64.whl
+-rwxrwxrwx 1 hitbuyi hitbuyi   24585457 6月  30 00:16 torchvision-0.11.2+cu113-cp36-cp36m-linux_x86_64.whl
+```
+copy files to container's upgrade folder
 
-```bash
-cd xtreme1-v0.9.1
-docker compose up
+    $docker cp  ./  xtreme1-v091-point-cloud-object-detection-1:/upgrade/  
+
+
+### step 5: enter the container again
+    $ docker exec -it xtreme1-v091-point-cloud-object-detection-1 /bin/bash
+
+ cd to upgrade,we the copied files here
+ ```
+ root@d803d8bc1748:/app/pcdet_open#  cd /upgrade
+ root@d803d8bc1748:/upgrade# 
+ root@d803d8bc1748:/upgrade#  ls -l 
+ ```
+ we found copied files
+```
+total 3992772
+-rwxr-xr-x 1 root root  363235328 Jun 30 17:14 cuda_11.3.1_465.19.01_linux.run
+-rwxrwxrwx 1 1000 1000 1879325034 Jun 29 16:55 cudnn-11.3-linux-x64-v8.2.1.32.tgz
+-rwxrwxrwx 1 1000 1000 1821432505 Jun 29 16:23 torch-1.10.1+cu113-cp36-cp36m-linux_x86_64.whl
+-rwxrwxrwx 1 1000 1000   24585457 Jun 29 16:16 torchvision-0.11.2+cu113-cp36-cp36m-linux_x86_64.whl
+```
+those *.whl files can be downloaded in official websites, I also put them on [here](www.baidu.com)
+### step 6: install torch,torchvision,CUDA-11.3 and CUDNN-8.2 
+#### 6.1 install torch,torchvision 
+```
+root@d803d8bc1748:/upgrade# pip install torch-1.10.1+cu113-cp36-cp36m-linux_x86_64.whl
+root@d803d8bc1748:/upgrade# pip install torchvision-0.11.2+cu113-cp36-cp36m-linux_x86_64.whl
+```
+#### 6.2 instal CUDA-11.3 and CUDNN8.2
+```
+root@d803d8bc1748:/upgrade# chmod +x cuda_11.3.1_465.19.01_linux.run
+root@d803d8bc1748:/upgrade#  sudo ./cuda_11.3.1_465.19.01_linux.run --silent --toolkit --override --installpath=/usr/local/cuda-11.3
+```
+note that CUDA-11.3 to be installed in /usr/local/cuda-11.3,wait for a while to finish CUDA-11.3 installment process 
+install CUDNN
+
+    root@d803d8bc1748:/upgrade# tar -xvf  cudnn-11.3-linux-x64-v8.2.1.32.tgz
+a `cuda` folder was generated in current directory
+```
+root@d803d8bc1748:/upgrade#$  sudo cp cuda/include/cudnn*.h /usr/local/cuda-11.3/include
+root@d803d8bc1748:/upgrade#$  sudo cp cuda/lib64/libcudnn* /usr/local/cuda-11.3/lib64
+root@d803d8bc1748:/upgrade#$  sudo chmod a+r /usr/local/cuda-11.3/include/cudnn*.h /usr/local/cuda-11.3/lib64/libcudnn*
 ```
 
-Visit [http://localhost:8190](http://localhost:8190) in the browser (Google Chrome is recommended) to try out Xtreme1! You can replace localhost with IP address if you want to access from another machine.
+use update-alternative to change CUDA from 10.2 to 11.3
+```
+root@d803d8bc1748:/upgrade#$ sudo update-alternatives --install /usr/local/cuda cuda /usr/local/cuda-10.2 113
+root@d803d8bc1748:/upgrade#$ sudo update-alternatives --install /usr/local/cuda cuda /usr/local/cuda-11.3 120
+root@d803d8bc1748:/upgrade#$ sudo update-alternatives --config cuda
+There are 2 choices for the alternative cuda (providing /usr/local/cuda).
 
-Docker compose will pull all service images from Docker Hub, including basic services `MySQL`, `Redis`, `MinIO`, and application services `backend`, `frontend`. You can find the username, password, hot binding port to access MySQL, Redis and MinIO in `docker-compose.yml`, for example you can access MinIO console at http://localhost:8194. We use Docker volume to save data, so you won't lose any data between container recreating.
+  Selection    Path                  Priority   Status
+------------------------------------------------------------
+  0            /usr/local/cuda-10.2   120       auto mode
+  1            /usr/local/cuda-10.2   120       manual mode
+* 2            /usr/local/cuda-11.3   113       manual mode
 
-Docker Compose advanced commands:
+Press <enter> to keep the current choice[*], or type selection number: 
+```
+type 2 to select CUDA-11.3 
+```
+root@d803d8bc1748:/upgrade# nvcc -V
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2021 NVIDIA Corporation
+Built on Mon_May__3_19:15:13_PDT_2021
+Cuda compilation tools, release 11.3, V11.3.109
+Build cuda_11.3.r11.3/compiler.29920130_0
+```
+you will see CUDA version had been changed from 10.2 to 11.3
 
-```bash
-# Start in the foreground.
-docker compose up
+### step 7:install cumm-cu113,spconv-cu113
+```
+root@d803d8bc1748:/upgrade#$ pip install cumm-cu113
+root@d803d8bc1748:/upgrade#$ pip install spconv-cu113
+```
+note that pip can download cumm-cu113 and spconv-cu113,though `ping` does not work. if your download speed is slow, I put spconv and other whl file used in step 4 [here](wwww.baidu.com)
 
-# Or add -d option to run in the background.
-docker compose up -d
-
-# When finished, you can start or stop all or specific services.
-docker compose start
-docker compose stop
-
-# Stop all services and delete all containers, but data volumes will be kept.
-docker compose down
-
-# Danger! Delete all volumes. All data in MySQL, Redis and MinIO. 
-docker compose down -v
+after installments are finished, delete all the install files
+```
+root@d803d8bc1748:/upgrade#$ cd ..
+root@d803d8bc1748:/upgrade#$ sudo rm  -rf ./upgrade
 ```
 
-### Start Built-in Models
+### step 8:restart the container
+ctrl+c to stop the xtreme1-v091 started in step 1, and run:
 
-You need to explicitly specify a model profile to enable model services.
+    $ docker compose --profile model up
 
-```bash
-docker compose --profile model up
-```
-
-Make sure you have installed [NVIDIA CUDA Driver](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html) on host machine.
-
-```bash
-# You need set "default-runtime" as "nvidia" in /etc/docker/daemon.json and restart docker to enable NVIDIA Container Toolkit
-{
-  "runtimes": {
-    "nvidia": {
-      "path": "nvidia-container-runtime",
-      "runtimeArgs": []
-    }
-  },
-  "default-runtime": "nvidia"
-}
-```
-
-If you use **Docker Desktop** + **WSL2.0**, please find this [issue #144](https://github.com/xtreme1-io/xtreme1/issues/144) for your reference.
-
-### Run on ARM CPU
-
-Please note that certain Docker images, including `MySQL`, may not be compatible with the ARM architecture. In case your computer is based on an ARM CPU (e.g. Apple M1), you can create a Docker Compose override file called docker-compose.override.yml and include the following content. While this method uses QEMU emulation to enforce the use of the ARM64 image on the ARM64 platform, it may impact performance.
-
-```yaml
-services:
-  mysql:
-    platform: linux/amd64
-```
-
-## Install from Source
-
-If you want to build or extend the function, download the source code and run locally.
-
-### Enable Docker BuildKit
-
-We are using Docker BuildKit to accelerate the building speed, such as cache Maven and NPM packages between builds. By default BuildKit is not enabled in Docker Desktop, you can enable it as follows. For more details, you can check the official document [Build images with BuildKit](https://docs.docker.com/develop/develop-images/build_enhancements/).
-
-```bash
-# Set the environment variable to enable BuildKit just for once.
-DOCKER_BUILDKIT=1 docker build .
-DOCKER_BUILDKIT=1 docker compose up
-
-# Or edit Docker daemon.json to enable BuildKit by default, the content can be something like '{ "features": { "buildkit": true } }'.
-vi /etc/docker/daemon.json
-
-# You can clear the builder cache if you encounter some package version related problem.
-docker builder prune
-```
-
-### Clone Repository
-
-```bash
-git clone https://github.com/basicai/xtreme1.git
-cd xtreme1
-```
-
-### Build Images and Run Services
-
-The `docker-compose.yml` default will pull application images from Docker Hub, if you want to build images from source code, you can comment on the service's image line and un-comment build line.
-
-```yaml
-services:
-  backend:
-    # image: basicai/xtreme1-backend
-    build: ./backend
-  frontend:
-    # image: basicai/xtreme1-frontend
-    build: ./frontend
-```
-
-Then when you run `docker compose up`, it will first build the `backend` and `frontend` image and start these services. Be sure to run `docker compose build` when code changes, as the up command will only build images when it does not exist.
-
-> You should not commit your change to `docker-compose.yml`, to avoid this, you can copy docker-compose.yml to a new file `docker-compose.develop.yml`, and modify this file as your development needs, as this file is already added into `.gitignore`. And you need to specify this specific file when running Docker Compose commands, such as `docker compose -f docker-compose.develop.yml build`.
-
-# License 
-This software is licensed under the Apache 2.0 LICENSE. Xtreme1 is a trademark of LF AI & Data Foundation.
-
-<img src="/docs/images/LFAI_DATA_horizontal-color.png" width="250">
-
-Xtreme1 is now hosted in [LF AI & Data Foundation](https://medium.com/multisensory-data-training/xtreme1-the-first-open-source-labeling-annotation-and-visualization-project-is-debuting-at-the-da1d157d1512) as the 1st open source data labeling annotation and visualization project.
-
-
-If Xtreme1 is part of your development process / project / publication, please cite us ❤️ :
-```bash
-@misc{Xtreme1,
-title = {Xtreme1 - The Next GEN Platform For Multisensory Training Data},
-year = {2023},
-note = {Software available from https://github.com/xtreme1-io/xtreme1/},
-url={https://xtreme1.io/},
-author = {LF AI & Data Foundation},
-}
-```
+open http://localhost:8190, login into it ,open a dataset to annotate ,run AI annotating, no model error happens
+![xtreme1 AI labeling](./images/AI%20Labelling.png) 
